@@ -15,21 +15,11 @@ function HomePage() {
   const imgX = useRef(0);
   const imgY = useRef(0);
   const imageData = useRef(null);
-  //   const [offsetY, setOffsetY] = useState(0);
-  const canvasContainer = useRef(null);
-
-  let currentX = 0;
-  let currentY = 0;
-  let draggable = false;
+  const ctxCopy = useRef(null);
 
   let isDown = false;
   let startX;
   let startY;
-
-  const ctxCopy = useRef(null);
-
-  //   let offsetX = canvasOffset.left;
-  //   let offsetY = canvasOffset.top;
 
   useEffect(() => {
     offsetX.current = canvasOffset.left;
@@ -149,7 +139,7 @@ function HomePage() {
     // get all selected Files
     const files = e.target.files;
 
-    Object.keys(files).map((key) => {
+    Object.keys(files).forEach((key) => {
       if (key === "0") {
         let file = files[key];
 
@@ -164,7 +154,6 @@ function HomePage() {
             reader.onload = function (e) {
               const canvasElement = document.getElementById("editorCanvas");
               setCanvasOffset(canvasElement.getBoundingClientRect());
-              // create HTMLImageElement holding image data
               const img = new Image();
               imageData.current = reader.result;
               img.src = reader.result;
@@ -178,7 +167,6 @@ function HomePage() {
 
                 editorCanvas.width = canvasWidth;
                 editorCanvas.height = canvasHeight;
-                // var ratio = Math.min(hRatio, vRatio);
 
                 const ctx = editorCanvas.getContext("2d");
                 ctxCopy.current = ctx;
@@ -197,7 +185,6 @@ function HomePage() {
                 var x = canvas.current.width / 2 - (img.width / 2) * xScale;
                 var y = canvas.current.height / 2 - (img.height / 2) * yScale;
 
-                // ctx.imageSmoothingQuality = "low";
                 ctx.drawImage(
                   img,
                   x,
@@ -209,8 +196,6 @@ function HomePage() {
               };
             };
             reader.readAsDataURL(file);
-            // process just one file.
-            return;
         }
       }
     });
@@ -255,7 +240,7 @@ function HomePage() {
     // get all selected Files
     const files = e.target.files;
 
-    Object.keys(files).map((key) => {
+    Object.keys(files).forEach((key) => {
       if (key === "0") {
         let file = files[key];
 
