@@ -294,9 +294,12 @@ function HomePage() {
 
   return (
     <div className="App">
-      <h1>Canvas</h1>
+      <h1 data-testid="titleId">Canvas</h1>
       <div className="actionContainer">
-        <div className="actionItemContainer">
+        <div
+          data-testid="imageSelectionInputId"
+          className="actionItemContainer"
+        >
           <label className="custom-file-upload">
             <input
               type="file"

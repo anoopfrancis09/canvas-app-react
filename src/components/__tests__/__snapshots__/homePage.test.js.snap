@@ -1,0 +1,55 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`matches snapshot 1`] = `
+<div
+  className="App"
+>
+  <h1
+    data-testid="titleId"
+  >
+    Canvas
+  </h1>
+  <div
+    className="actionContainer"
+  >
+    <div
+      className="actionItemContainer"
+      data-testid="imageSelectionInputId"
+    >
+      <label
+        className="custom-file-upload"
+      >
+        <input
+          accept="image/*"
+          id="fileSelector"
+          onChange={[Function]}
+          type="file"
+        />
+        Select an Image file
+      </label>
+    </div>
+    <div
+      className="actionItemContainer"
+    >
+      <label
+        className="custom-file-upload"
+      >
+        <input
+          onChange={[Function]}
+          type="file"
+        />
+        Click to upload image
+      </label>
+    </div>
+  </div>
+  <canvas
+    className="canvas"
+    id="editorCanvas"
+    onClick={[Function]}
+    onMouseDown={[Function]}
+    onMouseMove={[Function]}
+    onMouseOut={[Function]}
+    onMouseUp={[Function]}
+  />
+</div>
+`;
