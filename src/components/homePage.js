@@ -7,6 +7,7 @@ function HomePage() {
   const canvas = useRef(null);
   const [canvasOffset, setCanvasOffset] = useState(0);
   const [scaleFactor, setScaleFactor] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
   const offsetX = useRef(0);
   const offsetY = useRef(0);
   const imgWidth = useRef(0);
@@ -26,7 +27,7 @@ function HomePage() {
   let startY;
 
   const ctxCopy = useRef(null);
-  const imgCopy = useRef(null);
+
   //   let offsetX = canvasOffset.left;
   //   let offsetY = canvasOffset.top;
 
@@ -54,11 +55,8 @@ function HomePage() {
       return;
     }
 
-    console.log("Values::", imgX, imgY);
     imgX.current += mouseX - startX;
     imgY.current += mouseY - startY;
-
-    console.log("Values::", imgX, imgY);
 
     if (imgX.current > 0) {
       imgX.current = 0;
@@ -107,14 +105,13 @@ function HomePage() {
   };
 
   const reDrawImageOnCanvas = () => {
-    if (ctxCopy && imgCopy) {
+    if (ctxCopy && selectedImage) {
       ctxCopy.current.clearRect(0, 0, canvas.width, canvas.height);
-      ctxCopy.current.drawImage(imgCopy.current, imgX.current, imgY.current);
+      ctxCopy.current.drawImage(selectedImage, imgX.current, imgY.current);
     }
   };
 
   const scaleImageOnCanvas = () => {
-    console.log("Scaling...");
     ctxCopy.current.clearRect(0, 0, canvas.width, canvas.height);
 
     if (scaleFactor !== 1) {
@@ -122,7 +119,7 @@ function HomePage() {
       ctxCopy.current.scale(scaleFactor, scaleFactor);
     } else ctxCopy.current.restore();
 
-    ctxCopy.current.drawImage(imgCopy.current, imgX.current, imgY.current);
+    ctxCopy.current.drawImage(selectedImage, imgX.current, imgY.current);
   };
 
   const onClick = (e) => {
@@ -130,8 +127,8 @@ function HomePage() {
       case 1:
         return;
       case 2:
-        imgX.current = -(imgCopy.current.width / 2 - canvasWidth / 2);
-        imgY.current = -(imgCopy.current.height / 2 - canvasHeight / 2);
+        imgX.current = -(selectedImage.width / 2 - canvasWidth / 2);
+        imgY.current = -(selectedImage.height / 2 - canvasHeight / 2);
         reDrawImageOnCanvas();
         break;
       case 3:
@@ -170,13 +167,12 @@ function HomePage() {
               // create HTMLImageElement holding image data
               const img = new Image();
               imageData.current = reader.result;
-              console.log("reader.result", reader.result);
               img.src = reader.result;
 
               img.onload = function () {
                 imgX.current = -(img.width / 2 - canvasWidth / 2);
                 imgY.current = -(img.height / 2 - canvasHeight / 2);
-                imgCopy.current = img;
+                setSelectedImage(img);
                 imgHeight.current = img.height;
                 imgWidth.current = img.width;
 
@@ -184,7 +180,6 @@ function HomePage() {
                 editorCanvas.height = canvasHeight;
                 // var ratio = Math.min(hRatio, vRatio);
 
-                console.log("size", img.width, img.height);
                 const ctx = editorCanvas.getContext("2d");
                 ctxCopy.current = ctx;
 
@@ -226,26 +221,25 @@ function HomePage() {
   };
 
   const onUpload = () => {
-    console.log(imgX, imgCopy);
     const data = {
       canvas: {
         scaleFactor: scaleFactor,
+        width: canvasWidth,
+        height: canvasWidth,
         photo: {
           x: imgX.current,
           y: imgY.current,
-          height: imgCopy.current.height,
-          width: imgCopy.current.width,
+          height: selectedImage.height,
+          width: selectedImage.width,
           id: "imagetestId",
           imageData: imageData.current,
         },
       },
     };
-    console.log(data);
-
-    handleSaveToPC(data);
+    saveJSONFile(data);
   };
 
-  const handleSaveToPC = (jsonData) => {
+  const saveJSONFile = (jsonData) => {
     const fileData = JSON.stringify(jsonData);
     const blob = new Blob([fileData], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
@@ -282,7 +276,7 @@ function HomePage() {
               img.onload = function () {
                 imgX.current = storedImageData.canvas.photo.x;
                 imgY.current = storedImageData.canvas.photo.y;
-                imgCopy.current = img;
+                setSelectedImage(img);
                 imgHeight.current = storedImageData.canvas.photo.height;
                 imgWidth.current = storedImageData.canvas.photo.width;
 
@@ -313,16 +307,13 @@ function HomePage() {
     });
   };
 
-  console.log("imgCopy.current !== null", imgCopy.current !== null);
-
   return (
     <div className="App">
       <h1>Canvas</h1>
-      <form action="#">
-        <fieldset>
+      <div className="actionContainer">
+        <div className="actionItemContainer">
           <label className="custom-file-upload">
             <input
-              disabled={imgCopy.current !== null}
               type="file"
               id="fileSelector"
               accept="image/*"
@@ -330,36 +321,61 @@ function HomePage() {
             />
             Select an Image file
           </label>
-        </fieldset>
-        <fieldset>
+        </div>
+        <div className="actionItemContainer">
           <label className="custom-file-upload">
             <input type="file" onChange={onImport} />
             Click to upload image
           </label>
-        </fieldset>
-        <fieldset>
-          <label>Scale</label>
-          <button
-            disabled={scaleFactor === 1}
-            type="button"
-            className="button"
-            id="myBtn"
-            onClick={(e) => onScaleClick(100)}
-          >
-            100%
-          </button>
-          <button
-            disabled={scaleFactor === 2}
-            type="button"
-            className="button"
-            id="myBtn"
-            onClick={(e) => onScaleClick(200)}
-          >
-            200%
-          </button>
-        </fieldset>
-      </form>
+        </div>
+        {selectedImage ? (
+          <div className="actionItemContainer">
+            <label>Scale</label>
+            <button
+              disabled={scaleFactor === 1}
+              type="button"
+              className="button"
+              id="myBtn"
+              onClick={(e) => onScaleClick(100)}
+            >
+              100%
+            </button>
+            <button
+              disabled={scaleFactor === 2}
+              type="button"
+              className="button"
+              id="myBtn"
+              onClick={(e) => onScaleClick(200)}
+            >
+              200%
+            </button>
+          </div>
+        ) : null}
+      </div>
 
+      {selectedImage ? (
+        <>
+          <button
+            className="button"
+            type="button"
+            id="myBtn"
+            onClick={onUpload}
+          >
+            Upload Image
+          </button>
+        </>
+      ) : null}
+      {selectedImage ? (
+        <div className="messagesContainer">
+          <label className="messages" id="messagesLabel">
+            **Drag the image to position it on the canvas area.
+          </label>
+          <label className="messages" id="messagesLabel">
+            **Double click on the image to position it center on the canvas
+            area.
+          </label>
+        </div>
+      ) : null}
       <canvas
         className="canvas"
         ref={canvas}
@@ -370,9 +386,6 @@ function HomePage() {
         onMouseOut={onMouseOut}
         onClick={onClick}
       ></canvas>
-      <button className="button" type="button" id="myBtn" onClick={onUpload}>
-        Upload Image
-      </button>
     </div>
   );
 }
