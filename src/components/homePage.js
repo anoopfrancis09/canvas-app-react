@@ -6,7 +6,7 @@ import { canvasHeight, canvasWidth } from "../constants";
 function HomePage() {
   const canvas = useRef(null);
   const [canvasOffset, setCanvasOffset] = useState(0);
-  const [scaleFactor, setScaleFactor] = useState(null);
+  const [scaleFactor, setScaleFactor] = useState(1);
   const [selectedImage, setSelectedImage] = useState(null);
   const offsetX = useRef(0);
   const offsetY = useRef(0);
@@ -56,12 +56,15 @@ function HomePage() {
       imgY.current = 0;
     }
 
-    if (Math.abs(imgX.current) + canvasWidth > imgWidth.current) {
-      imgX.current = -(imgWidth.current - canvasWidth);
+    if (Math.abs(imgX.current) + canvasWidth / scaleFactor > imgWidth.current) {
+      imgX.current = -(imgWidth.current - canvasWidth / scaleFactor);
     }
 
-    if (Math.abs(imgY.current) + canvasHeight > imgHeight.current) {
-      imgY.current = -(imgHeight.current - canvasHeight);
+    if (
+      Math.abs(imgY.current) + canvasHeight / scaleFactor >
+      imgHeight.current
+    ) {
+      imgY.current = -(imgHeight.current - canvasHeight / scaleFactor);
     }
 
     startX = mouseX;
@@ -102,14 +105,16 @@ function HomePage() {
   };
 
   const scaleImageOnCanvas = () => {
-    ctxCopy.current.clearRect(0, 0, canvas.width, canvas.height);
+    if (ctxCopy.current) {
+      ctxCopy.current.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (scaleFactor !== 1) {
-      ctxCopy.current.save();
-      ctxCopy.current.scale(scaleFactor, scaleFactor);
-    } else ctxCopy.current.restore();
+      if (scaleFactor !== 1) {
+        ctxCopy.current.save();
+        ctxCopy.current.scale(scaleFactor, scaleFactor);
+      } else ctxCopy.current.restore();
 
-    ctxCopy.current.drawImage(selectedImage, imgX.current, imgY.current);
+      ctxCopy.current.drawImage(selectedImage, imgX.current, imgY.current);
+    }
   };
 
   const onClick = (e) => {
