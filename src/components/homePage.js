@@ -221,7 +221,6 @@ function HomePage() {
           y: imgY.current,
           height: selectedImage.height,
           width: selectedImage.width,
-          id: "imagetestId",
           imageData: imageData.current,
         },
       },
@@ -299,15 +298,13 @@ function HomePage() {
 
   return (
     <div className="App">
-      <h1 data-testid="titleId">Canvas</h1>
+      <h1 className="title">Canvas</h1>
       <div className="actionContainer">
-        <div
-          data-testid="imageSelectionInputId"
-          className="actionItemContainer"
-        >
+        <div className="actionItemContainer">
           <label className="custom-file-upload">
             <input
               type="file"
+              className="imageSelector"
               id="fileSelector"
               accept="image/*"
               onChange={onFileChange}
@@ -317,11 +314,11 @@ function HomePage() {
         </div>
         <div className="actionItemContainer">
           <label className="custom-file-upload">
-            <input type="file" onChange={onImport} />
+            <input className="imageImporter" type="file" onChange={onImport} />
             Click to upload image
           </label>
         </div>
-        {selectedImage ? (
+        {selectedImage && (
           <div className="actionItemContainer">
             <label>Scale</label>
             <button
@@ -343,7 +340,7 @@ function HomePage() {
               200%
             </button>
           </div>
-        ) : null}
+        )}
       </div>
 
       {selectedImage ? (
