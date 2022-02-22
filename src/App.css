@@ -57,6 +57,7 @@ input[type="file"] {
 .actionContainer {
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .actionItemContainer {

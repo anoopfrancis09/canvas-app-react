@@ -56,6 +56,7 @@ it("check if the canvas is present or not", () => {
 it("should call onChange on Image import input", () => {
   const fileContents = "file contents";
   const readAsText = jest.fn();
+  const onload = Function;
   const addEventListener = jest.fn((_, evtHandler) => {
     evtHandler();
   });
@@ -63,6 +64,7 @@ it("should call onChange on Image import input", () => {
   const dummyFileReader = {
     addEventListener,
     readAsText,
+    onload,
     result: fileContents,
   };
   window.FileReader = jest.fn(() => dummyFileReader);

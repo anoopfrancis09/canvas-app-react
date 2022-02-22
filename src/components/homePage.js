@@ -2,6 +2,8 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import { canvasHeight, canvasWidth } from "../constants";
+import ScaleActionItems from "./scaleActionItems";
+import MessageContainer from "./infoMessageContainer";
 
 function HomePage() {
   const canvas = useRef(null);
@@ -17,7 +19,7 @@ function HomePage() {
   const imageData = useRef(null);
   const ctxCopy = useRef(null);
 
-  let isDown = false;
+  let isMouseDown = false;
   let startX;
   let startY;
 
@@ -33,7 +35,7 @@ function HomePage() {
   }, [scaleFactor]);
 
   const onMouseMove = (e) => {
-    if (!isDown) {
+    if (!isMouseDown) {
       return;
     }
     e.preventDefault();
@@ -41,7 +43,7 @@ function HomePage() {
     const mouseY = parseInt(e.clientY - offsetY.current);
 
     // Put your mousemove stuff here
-    if (!isDown) {
+    if (!isMouseDown) {
       return;
     }
 
@@ -83,18 +85,18 @@ function HomePage() {
       startY >= imgY.current &&
       startY <= imgY.current + imgHeight.current
     ) {
-      isDown = true;
+      isMouseDown = true;
     }
   };
 
   const onMouseUp = (e) => {
     e.preventDefault();
-    isDown = false;
+    isMouseDown = false;
   };
 
   const onMouseOut = (e) => {
     e.preventDefault();
-    isDown = false;
+    isMouseDown = false;
   };
 
   const reDrawImageOnCanvas = () => {
@@ -197,7 +199,6 @@ function HomePage() {
                   img.width * xScale,
                   img.height * yScale
                 );
-                // ctx.drawImage(img, imgX.current, imgY.current);
               };
             };
             reader.readAsDataURL(file);
@@ -273,10 +274,7 @@ function HomePage() {
                 editorCanvas.height = canvasHeight;
 
                 const ctx = editorCanvas.getContext("2d");
-                // ctx.scale(
-                //   storedImageData.canvas.scaleFactor,
-                //   storedImageData.canvas.scaleFactor
-                // );
+
                 ctxCopy.current = ctx;
 
                 ctx.drawImage(
@@ -314,31 +312,21 @@ function HomePage() {
         </div>
         <div className="actionItemContainer">
           <label className="custom-file-upload">
-            <input className="imageImporter" type="file" onChange={onImport} />
+            <input
+              className="imageImporter"
+              accept="application/json"
+              type="file"
+              onChange={onImport}
+            />
             Click to upload image
           </label>
         </div>
         {selectedImage && (
-          <div className="actionItemContainer">
-            <label>Scale</label>
-            <button
-              disabled={scaleFactor === 1}
-              type="button"
-              className="button"
-              id="myBtn"
-              onClick={(e) => onScaleClick(100)}
-            >
-              100%
-            </button>
-            <button
-              disabled={scaleFactor === 2}
-              type="button"
-              className="button"
-              id="myBtn"
-              onClick={(e) => onScaleClick(200)}
-            >
-              200%
-            </button>
+          <div>
+            <ScaleActionItems
+              onScaleClick={onScaleClick}
+              scaleFactor={scaleFactor}
+            />
           </div>
         )}
       </div>
@@ -355,17 +343,7 @@ function HomePage() {
           </button>
         </>
       ) : null}
-      {selectedImage ? (
-        <div className="messagesContainer">
-          <label className="messages" id="messagesLabel">
-            **Drag the image to position it on the canvas area.
-          </label>
-          <label className="messages" id="messagesLabel">
-            **Double click on the image to position it center on the canvas
-            area.
-          </label>
-        </div>
-      ) : null}
+      {selectedImage ? <MessageContainer /> : null}
       <canvas
         className="canvas"
         ref={canvas}
